@@ -8,7 +8,7 @@ function readMap (filename, callback) {
     var fs = require('fs');
 
     var lineReader = readline.createInterface({
-        terminal: false,
+        terminal: false,   /* Workaround an issue with isTTY in Node 0.10.3[78] and 0.12.0.  http://tinyurl.com/q898mm6 */
         input: fs.createReadStream(filename),
     });
 
