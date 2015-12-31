@@ -12,7 +12,7 @@ function readMap (filename, callback) {
         input: fs.createReadStream(filename),
     });
 
-    var map = [];
+    var mountainMap = [];
 
     var firstLine = true;
 
@@ -27,12 +27,12 @@ function readMap (filename, callback) {
             // But we don't actually need these, since the data itself implies the size
             // In fact by not specifying a fixed width and height, we could potentially process sparse maps in future
         } else {
-            map.push( line.split(" ").map(Number) );
+            mountainMap.push( line.split(" ").map(Number) );
         }
     });
 
     lineReader.on('close', function () {
-        callback(map);
+        callback(mountainMap);
     });
 }
 
@@ -42,8 +42,8 @@ function readMap (filename, callback) {
  * After processing, each object will also contain the maxDistance available from that node, and an array of goodDirections in which that distance can be reached.
  * CONSIDER: Instead of goodDirections, we could just store the actual objects for the neighbouring boxes, i.e. goodNeighbours.
  */
-function createDataMap (map) {
-    return map.map(function (row, y) {
+function createDataMap (mountainMap) {
+    return mountainMap.map(function (row, y) {
         return row.map(function (elevation, x) {
             return {
                 x: x,
@@ -174,7 +174,7 @@ function simplifyPath (path) {
     return _.pluck(path, 'elevation').join("-");
 }
 
-function processMap (map) {
+function processMap (mountainMap) {
     /* We will take a dynamic programming approach:
      * We will visit each of the boxes from the bottom of the mountain upwards.
      * For each box we will determine its maxDistance based on its neighbouring boxes.
@@ -182,7 +182,7 @@ function processMap (map) {
      * This approach means we can find the maxDistance for all boxes in linear time.
      */
 
-    var dataMap = createDataMap(map);
+    var dataMap = createDataMap(mountainMap);
 
     var boxesFromLowToHigh = _.flatten(dataMap).sort(function (a, b) {
         return a.elevation - b.elevation;
