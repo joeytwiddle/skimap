@@ -1,3 +1,6 @@
+// RedMart skiing diversion
+// By Paul "Joey" Clark <joeytwiddle@gmail.com>
+
 var _ = require('underscore');
 
 function readMap (filename, callback) {
@@ -36,8 +39,8 @@ function readMap (filename, callback) {
 /* createDataMap
  *
  * Creates a new 2D array, where each entry is now an object holding the x,y position and elevation of each box.
- * After processing, each object will also contain the maxDistance available from that node, and the goodDirections in which that distance can be reached.
- * CONSIDER: Instead of goodDirections, we could just store the actual record for the neighbouring box.
+ * After processing, each object will also contain the maxDistance available from that node, and an array of goodDirections in which that distance can be reached.
+ * CONSIDER: Instead of goodDirections, we could just store the actual objects for the neighbouring boxes, i.e. goodNeighbours.
  */
 function createDataMap (map) {
     var dataMap = [];
@@ -68,7 +71,7 @@ function getBoxAt (array2d, x, y) {
     var row = array2d[y];
     if (!row) {
         // Off map vertically (or a sparse row)
-        return null;
+        return undefined;
     }
     var cell = row[x];
     return cell;
@@ -78,8 +81,6 @@ function getBoxAt (array2d, x, y) {
 // We could consider pulling these functions into a closure, so they can all access dataMap without having to pass it.
 
 function processBox (box, dataMap) {
-    //console.log("[find_longest_route.es5] box:", box);
-
     // This will be the final value for this box if no neighbours can be visited.
     box.maxDistance = 0;
 
@@ -103,7 +104,6 @@ function processBox (box, dataMap) {
             // If it is better or as good as our best so far, add this direction as a possibility
             if (distanceViaNeighbour >= box.maxDistance) {
                 box.goodDirections.push( direction );
-                //console.log("[find_longest_route.es5] box:", box);
             }
         }
     });
@@ -126,12 +126,13 @@ function findBestStartPoints (dataMap) {
     return bestStartPoints;
 }
 
-/* I want to consider the possibility where one box may have multiple paths of the same length, and possibly even the same steepness.
+/* A recursive function to collect the results.
+ * We want to consider the possibility that one box may have multiple paths of the same length.
  * Therefore a box does not always return just one path, but could return multiple paths.
  */
 function getGoodPathsFromBox (dataMap, box) {
     // Is this the last box, i.e. no neighbours to visit from here?
-    // With above algorithm, only the middle term actually needs to be tested, but best to be safe in case the algorithm changes!
+    // With above algorithm, only the middle term actually needs to be tested, but best to be safe in case the algorithm changes in future!
     if (box && box.goodDirections && box.goodDirections.length > 0) {
         // There are one or more boxes we can ski to from here
         // We will gather all of their paths, and for each path add this box on the front
@@ -157,7 +158,6 @@ function getGoodPathsFromStartPoints (dataMap, startPoints) {
     var allPaths = [];
     startPoints.forEach(function (startPoint) {
         var paths = getGoodPathsFromBox(dataMap, startPoint);
-        //console.log("[find_longest_route.es5] paths:", paths);
         paths.forEach(function (path) {
             allPaths.push(path);
         });
@@ -195,34 +195,30 @@ function processMap (map) {
 
     var dataMap = createDataMap(map);
 
-    var pointsByAltitude = _.flatten(dataMap).sort(function (a, b) {
+    var boxesFromLowToHigh = _.flatten(dataMap).sort(function (a, b) {
         return a.elevation - b.elevation;
     });
-    //console.log("[find_longest_route.es5] pointsByAltitude:", pointsByAltitude);
 
     // Process each box, starting with those at the bottom of the mountain
-    pointsByAltitude.forEach(function (box) {
+    boxesFromLowToHigh.forEach(function (box) {
         processBox(box, dataMap);
     });
 
-    // Get the points with the longest distance
+    // Get the box(es) with the longest distance
     var bestStartPoints = findBestStartPoints(dataMap);
-    //console.log("[find_longest_route.es5] bestStartPoints:", bestStartPoints);
 
-    /* Now all that is left is to gather all the longest paths,
-     * and select the steepest of them.
-     */
+    /* Now all that is left is to gather all the longest paths, and select the
+     * steepest of them. */
 
     var potentialPaths = getGoodPathsFromStartPoints(dataMap, bestStartPoints);
-    console.log("[find_longest_route.es5] potentialPaths:", potentialPaths.map(simplifyPath));
+    console.log("[find_longest_route.js] potentialPaths:", potentialPaths.map(simplifyPath));
 
-    // The spec says: If there are several paths down of the same length, you want to take the one with the steepest vertical drop, i.e. the largest difference between your starting elevation and your ending elevation.
     var steepestPaths = selectPathsWithGreatestSteepness(potentialPaths);
-    console.log("[find_longest_route.es5] steepestPaths:", steepestPaths.map(simplifyPath));
+    console.log("[find_longest_route.js] steepestPaths:", steepestPaths.map(simplifyPath));
 
     // For the purposes of the exercise, assume there will be only one solution:
     var steepestPath = steepestPaths[0];
-    console.log("Steepest path has length %s and drop %s", steepestPath.length, steepestPath.steepness);
+    console.log("[find_longest_route.js] Steepest path has length %s and drop %s", steepestPath.length, steepestPath.steepness);
 }
 
 var filename = process.argv[2];
