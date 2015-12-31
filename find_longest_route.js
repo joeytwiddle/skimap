@@ -43,21 +43,17 @@ function readMap (filename, callback) {
  * CONSIDER: Instead of goodDirections, we could just store the actual objects for the neighbouring boxes, i.e. goodNeighbours.
  */
 function createDataMap (map) {
-    var dataMap = [];
-    map.forEach(function (row, y) {
-        var newRow = [];
-        row.forEach(function (elevation, x) {
-            newRow.push({
+    return map.map(function (row, y) {
+        return row.map(function (elevation, x) {
+            return {
                 x: x,
                 y: y,
                 elevation: elevation,
                 //maxDistance: undefined,
                 //goodDirections: undefined,
-            });
+            };
         });
-        dataMap.push(newRow);
     });
-    return dataMap;
 }
 
 function getNeighbourInDirection (dataMap, box, direction) {
