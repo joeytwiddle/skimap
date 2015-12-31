@@ -56,25 +56,18 @@ function createDataMap (map) {
     });
 }
 
+// CONSIDER: All of the next six functions make use of dataMap, and pass it around.
+// We could consider pulling these functions into a closure, so they can all access dataMap without having to pass it.
+
 function getNeighbourInDirection (dataMap, box, direction) {
-    var neighbourX = box.x + direction[0];
-    var neighbourY = box.y + direction[1];
-    return getBoxAt(dataMap, neighbourX, neighbourY);
+    return getBoxAt(dataMap, box.x + direction[0], box.y + direction[1]);
 }
 
 // Basic 2d-array lookup, but also handles out-of-bounds
 function getBoxAt (array2d, x, y) {
     var row = array2d[y];
-    if (!row) {
-        // Off map vertically (or a sparse row)
-        return undefined;
-    }
-    var cell = row[x];
-    return cell;
+    return row && row[x];
 }
-
-// CONSIDER: The next four functions, and a few above, all make use of dataMap, and pass it around.
-// We could consider pulling these functions into a closure, so they can all access dataMap without having to pass it.
 
 function processBox (box, dataMap) {
     // This will be the final value for this box if no neighbours can be visited.
