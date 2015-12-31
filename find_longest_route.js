@@ -200,14 +200,14 @@ function processMap (mountainMap) {
      * steepest of them. */
 
     var potentialPaths = getGoodPathsFromStartPoints(dataMap, bestStartPoints);
-    console.log("[find_longest_route.js] potentialPaths:", potentialPaths.map(simplifyPath));
+    console.log("[find_longest_route.js] potentialPaths:", potentialPaths.map(simplifyPath).join(", "));
 
     var steepestPaths = selectPathsWithGreatestSteepness(potentialPaths);
-    console.log("[find_longest_route.js] steepestPaths:", steepestPaths.map(simplifyPath));
 
     // For the purposes of the exercise, assume there will be only one solution:
-    var steepestPath = steepestPaths[0];
-    console.log("[find_longest_route.js] Steepest path has length %s and drop %s", steepestPath.length, steepestPath.steepness);
+    steepestPaths.forEach(function (steepestPath) {
+        console.log("[find_longest_route.js] Steepest path %s has length %s and drop %s", simplifyPath(steepestPath), steepestPath.length, steepestPath.steepness);
+    });
 }
 
 var filename = process.argv[2];
