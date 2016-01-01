@@ -150,9 +150,10 @@ function getGoodPathsFromStartPoints (dataMap, startPoints) {
 }
 
 function addSteepness (path) {
-    var startBox = path[0];
-    var endBox = path[path.length - 1];
+    var startBox = _.first(path);
+    var endBox = _.last(path);
     var steepness = startBox.elevation - endBox.elevation;
+
     path.steepness = steepness;
 }
 
