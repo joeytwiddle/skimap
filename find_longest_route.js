@@ -115,31 +115,26 @@ function findBestStartPoints (dataMap) {
     return bestStartPoints;
 }
 
-/* A recursive function to collect the results.
- * We want to consider the possibility that one box may have multiple paths of the same length.
- * Therefore a box does not always return just one path, but could return multiple paths.
+/* Collect all the paths below one box.
+ * Each box may return multiple paths of the same length.
  */
 function getGoodPathsFromBox (dataMap, box) {
-    // Is this the last box, i.e. no neighbours to visit from here?
-    // With above algorithm, only the middle term actually needs to be tested, but best to be safe in case the algorithm changes in future!
-    if (box && box.goodDirections && box.goodDirections.length > 0) {
-        // There are one or more boxes we can ski to from here
-        // We will gather all of their paths, and for each path add this box on the front
-        var allGoodPathsFromThisBox = [];
-        box.goodDirections.forEach(function (direction) {
+    if (box.goodDirections) {
+        // For each neighbour, get its paths and prepend this box to the front
+        var routesForEachDirection = box.goodDirections.map(function (direction) {
             var neighbourBox = getNeighbourInDirection(dataMap, box, direction);
-            // As stated above, each neighbour could return multiple paths
             var pathsFromNeighbour = getGoodPathsFromBox(dataMap, neighbourBox);
-            pathsFromNeighbour.forEach(function (onePathFromNeighbour) {
+            return pathsFromNeighbour.map(function (onePathFromNeighbour) {
                 // Add the current box to the beginning of the path for the neighbouring box
-                var pathIncludingThisBox = _.flatten([box, onePathFromNeighbour]);
-                // And add that to the list of all paths from this box, which we will return
-                allGoodPathsFromThisBox.push( pathIncludingThisBox );
+                var neighbourPathWithThisBoxAdded = _.flatten([box, onePathFromNeighbour]);
+                return neighbourPathWithThisBoxAdded;
             });
         });
-        return allGoodPathsFromThisBox;
+        // Combine the results from all directions into one list
+        return _.flatten(routesForEachDirection, true);
     } else {
-        return [ box ];
+        // There are no neighbours to visit.  Return one path which visits this box.
+        return [ [ box ] ];
     }
 }
 
