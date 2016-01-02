@@ -38,8 +38,15 @@ function readMap (filename, callback) {
 
 /* createDataMap
  *
- * Creates a new 2D array, where each entry is now an object holding the x,y position and elevation of each box.
- * After processing, each object will also contain the maxDistance available from that node, and an array of goodDirections in which that distance can be reached.
+ * Initialises a 2D array of objects like this:
+ *     {
+ *         x: 3,                                 - original map data
+ *         y: 5,
+ *         elevation: 4,
+ *         maxDistance: 5,                       - initially undefined, these
+ *         goodDirections: [ [0,+1], [-1,0] ],     will be filled by processMap
+ *     }
+ *
  * CONSIDER: Instead of goodDirections, we could just store the actual objects for the neighbouring boxes, i.e. goodNeighbours.
  */
 function createDataMap (mountainMap) {
