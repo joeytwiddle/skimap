@@ -2,7 +2,9 @@
   "name": "redmart_ski_route",
   "version": "0.0.1",
   "description": "",
-  "main": "find_longest_route.js",
+  "scripts": {
+    "example": "node find_longest_route.js map.txt"
+  },
   "author": "Paul \"Joey\" Clark <joey@neuralyte.org>",
   "license": "UNLICENSED",
   "dependencies": {
