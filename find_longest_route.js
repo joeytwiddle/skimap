@@ -177,9 +177,7 @@ function processMap (mountainMap) {
 
     var dataMap = createDataMap(mountainMap);
 
-    var boxesFromLowToHigh = _.flatten(dataMap).sort(function (a, b) {
-        return a.elevation - b.elevation;
-    });
+    var boxesFromLowToHigh = _.sortBy(_.flatten(dataMap), 'elevation');
 
     // Process each box, starting with those at the bottom of the mountain
     boxesFromLowToHigh.forEach(function (box) {
