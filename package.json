@@ -4,7 +4,7 @@
   "description": "",
   "main": "find_longest_route.js",
   "author": "Paul \"Joey\" Clark <joey@neuralyte.org>",
-  "license": "Proprietary",
+  "license": "UNLICENSED",
   "dependencies": {
     "underscore": "~1.8.3"
   }
