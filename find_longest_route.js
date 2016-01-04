@@ -106,19 +106,9 @@ function processBox (box, dataMap) {
 }
 
 function findBestStartPoints (dataMap) {
-    var bestDistance = -1;
-    var bestStartPoints = [];
-    dataMap.forEach(function (row) {
-        row.forEach(function (box) {
-            if (box.maxDistance > bestDistance) {
-                bestStartPoints = [];
-            }
-            if (box.maxDistance >= bestDistance) {
-                bestDistance = box.maxDistance;
-                bestStartPoints.push(box);
-            }
-        });
-    });
+    var allBoxes = _.flatten(dataMap);
+    var bestDistance = _.max( _.pluck(allBoxes, 'maxDistance') );
+    var bestStartPoints = _.where(allBoxes, { maxDistance: bestDistance });
     return bestStartPoints;
 }
 
